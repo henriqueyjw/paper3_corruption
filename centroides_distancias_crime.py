@@ -38,8 +38,6 @@ for comarca in corrupcao.comarca.unique():
                 if comarca == 'SÃO PAULO':
                     for foro in corrupcao[corrupcao.comarca == comarca].foro.unique():
                         try:
-                            # X_hash = vectorizer_hash.transform(corrupcao.decisao_clean[(corrupcao.comarca == comarca) & (corrupcao.foro == foro) & (corrupcao.ano == year) & (corrupcao.mes == month)])
-                            # n_assunto = len(corrupcao.assunto[(corrupcao.comarca == comarca) & (corrupcao.foro == foro) & (corrupcao.ano == year) & (corrupcao.mes == month)].unique())
                             X_hash = vectorizer_hash.transform(corrupcao.decisao_clean[(corrupcao.assunto == assunto) & (corrupcao.comarca == comarca) & (corrupcao.foro == foro) & (corrupcao.ano == year) & (corrupcao.mes == month)])
                             n_assunto = len(corrupcao.assunto[(corrupcao.assunto == assunto) & (corrupcao.comarca == comarca) & (corrupcao.foro == foro) & (corrupcao.ano == year) & (corrupcao.mes == month)].unique())
                             indices_centers, labels = closest_n_index(X_hash, n_assunto)
@@ -62,8 +60,6 @@ for comarca in corrupcao.comarca.unique():
 
                 if comarca != 'SÃO PAULO':
                     try:
-                        # X_hash = vectorizer_hash.transform(corrupcao.decisao_clean[(corrupcao.comarca == comarca) & (corrupcao.ano == year) & (corrupcao.mes == month)])
-                        # n_assunto = len(corrupcao.assunto[(corrupcao.comarca == comarca) & (corrupcao.ano == year) & (corrupcao.mes == month)].unique())
                         X_hash = vectorizer_hash.transform(corrupcao.decisao_clean[(corrupcao.assunto == assunto) & (corrupcao.comarca == comarca) & (corrupcao.ano == year) & (corrupcao.mes == month)])
                         n_assunto = len(corrupcao.assunto[(corrupcao.assunto == assunto) & (corrupcao.comarca == comarca) & (corrupcao.ano == year) & (corrupcao.mes == month)].unique())
                         indices_centers, labels = closest_n_index(X_hash, n_assunto)
@@ -90,7 +86,7 @@ corrupcao = corrupcao.dropna()
 n_features = 10000
 vectorizer_hash = HashingVectorizer(n_features=n_features, ngram_range=(1, 3))
 
-files = 'sentencas_trafico_processadas.csv'
+files = 'sentencas_crime_processadas.csv'
 trafico = pd.read_csv(os.path.join(ini_path,files))
 trafico = trafico.dropna()
 
@@ -109,15 +105,14 @@ for comarca in trafico.comarca.unique():
             if comarca == 'SÃO PAULO':
                 for foro in trafico[trafico.comarca == comarca].foro.unique():
                     try:
-                        X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)])
-                        n_assunto = len(trafico.assunto[(trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)].unique())
                         # X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.assunto == assunto) & (trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)])
                         # n_assunto = len(trafico.assunto[(trafico.assunto == assunto) & (trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)].unique())
+                        X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)])
+                        n_assunto = len(trafico.assunto[(trafico.comarca == comarca) & (trafico.foro == foro) & (trafico.ano == year) & (trafico.mes == month)].unique())
                         indices_centers, labels = closest_n_index(X_hash, n_assunto)
                         for vector in indices_centers.toarray():
                             rows = dict()
                             rows['comarca'] = comarca + ' - '+ foro
-                            # rows['assunto'] = assunto
                             rows['ano'] = year
                             rows['mes'] = month
                             rows['vectors'] = vector
@@ -125,7 +120,6 @@ for comarca in trafico.comarca.unique():
                     except:
                         rows = dict()
                         rows['comarca'] = comarca + ' - '+ foro
-                        # rows['assunto'] = assunto
                         rows['ano'] = year
                         rows['mes'] = month
                         rows['vectors'] = np.nan
@@ -133,15 +127,14 @@ for comarca in trafico.comarca.unique():
 
             if comarca != 'SÃO PAULO':
                 try:
-                    X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)])
-                    n_assunto = len(trafico.assunto[(trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)].unique())
                     # X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.assunto == assunto) & (trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)])
                     # n_assunto = len(trafico.assunto[(trafico.assunto == assunto) & (trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)].unique())
+                    X_hash = vectorizer_hash.transform(trafico.decisao_clean[(trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)])
+                    n_assunto = len(trafico.assunto[(trafico.comarca == comarca) & (trafico.ano == year) & (trafico.mes == month)].unique())
                     indices_centers, labels = closest_n_index(X_hash, n_assunto)
                     for vector in indices_centers.toarray():
                         rows = dict()
                         rows['comarca'] = comarca
-                        # rows['assunto'] = assunto
                         rows['ano'] = year
                         rows['mes'] = month
                         rows['vectors'] = vector
@@ -149,7 +142,6 @@ for comarca in trafico.comarca.unique():
                 except:
                     rows = dict()
                     rows['comarca'] = comarca
-                    # rows['assunto'] = assunto
                     rows['ano'] = year
                     rows['mes'] = month
                     rows['vectors'] = np.nan
@@ -182,4 +174,4 @@ for _,row in corrupcao.iterrows():
         distancia.append(num_anterior)
         
 corrupcao['distancia'] = distancia
-corrupcao.to_excel(os.path.join(ini_path, f'corrupcao_trafico_distancia_corrigido.xlsx'), index=False)
+corrupcao.to_excel(os.path.join(ini_path, f'corrupcao_crime_distancia_corrigido.xlsx'), index=False)
